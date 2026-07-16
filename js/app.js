@@ -1,4 +1,4 @@
-import { normalize, search } from "./search.js";
+import { normalize, parseQueries, search } from "./search.js";
 
 const EXAMPLES = ["Huawei", "Beihang University", "SMIC", "ZTE", "Hikvision",
   "Harbin Institute of Technology"];
@@ -67,7 +67,7 @@ function renderStats() {
   el.stats.hidden = false;
 }
 
-function renderResults(query, results) {
+function buildResultBlock(query, results) {
   const byList = new Map();
   for (const r of results) {
     if (!byList.has(r.entry.l)) byList.set(r.entry.l, []);
@@ -76,7 +76,7 @@ function renderResults(query, results) {
   const listsHit = snapshot.lists.filter((l) => byList.has(l.id));
 
   if (!listsHit.length) {
-    el.results.innerHTML = `
+    return `
       <div class="summary clear">
         <h2><span class="q">${esc(query)}</span> &mdash; no matches in the ${snapshot.lists.length} lists in this tool</h2>
         <p>This is <strong>not</strong> a clearance determination. It means only that the search
@@ -85,7 +85,6 @@ function renderResults(query, results) {
         For authoritative screening, contact
         <a href="mailto:exportcontrols@northwestern.edu">exportcontrols@northwestern.edu</a>.</p>
       </div>`;
-    return;
   }
 
   const summary = `
@@ -119,20 +118,39 @@ function renderResults(query, results) {
       </div>`;
   }).join("");
 
-  el.results.innerHTML = summary + cards;
+  return summary + cards;
 }
 
 function runSearch() {
   if (!snapshot) return;
-  const query = el.query.value.trim();
-  if (normalize(query).replace(/[^\p{L}\p{N}]/gu, "").length < 2) {
+  const queries = parseQueries(el.query.value).filter(
+    (q) => normalize(q).replace(/[^\p{L}\p{N}]/gu, "").length >= 2);
+  if (!queries.length) {
     el.results.innerHTML = `
       <div class="summary">
-        <p>Enter at least two characters of an entity or individual name.</p>
+        <p>Enter at least two characters of an entity or individual name.
+        Separate multiple parties with commas to screen them in one batch.</p>
       </div>`;
     return;
   }
-  renderResults(query, search(query, snapshot));
+
+  if (queries.length === 1) {
+    el.results.innerHTML = buildResultBlock(queries[0], search(queries[0], snapshot));
+    return;
+  }
+
+  const blocks = queries.map((q) => ({ q, results: search(q, snapshot) }));
+  const flagged = blocks.filter((b) => b.results.length).length;
+  el.results.innerHTML = `
+    <div class="batch-overview ${flagged ? "hit" : "clear"}">
+      <strong>Batch screening:</strong> ${queries.length} parties checked &mdash;
+      ${flagged ? `${flagged} with potential matches` : "no potential matches"}
+    </div>` +
+    blocks.map(({ q, results }) => `
+      <section class="batch-block">
+        <h2 class="batch-name">${esc(q)}</h2>
+        ${buildResultBlock(q, results)}
+      </section>`).join("");
 }
 
 async function init() {

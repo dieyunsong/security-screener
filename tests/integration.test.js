@@ -9,8 +9,8 @@ function listsFor(query) {
   return [...new Set(search(query, snapshot).map((r) => r.entry.l))].sort();
 }
 
-test("snapshot has all 11 lists and no empty list", () => {
-  assert.equal(snapshot.lists.length, 11);
+test("snapshot has all 14 lists and no empty list", () => {
+  assert.equal(snapshot.lists.length, 14);
   for (const list of snapshot.lists) {
     assert.ok(list.count > 0, `${list.id} is empty`);
   }
@@ -29,11 +29,27 @@ test("beihang is identified on the Entity List and the 1286 list", () => {
   assert.ok(lists.includes("1286"));
 });
 
-test("huawei is identified on Entity List, 1260H and FCC Covered List", () => {
+test("huawei is identified on Entity List, 1260H, FCC Covered List and Section 889", () => {
   const lists = listsFor("huawei");
-  for (const id of ["el", "1260h", "fcc"]) {
+  for (const id of ["el", "1260h", "fcc", "889"]) {
     assert.ok(lists.includes(id), `huawei missing from ${id}`);
   }
+});
+
+test("smic is identified on the Section 5949 semiconductor list", () => {
+  assert.ok(listsFor("smic").includes("5949"));
+});
+
+test("SDN entries are searchable", () => {
+  assert.ok(listsFor("islamic revolutionary guard corps").includes("sdn"));
+});
+
+test("batch example resolves each party independently", () => {
+  const queries = ["SABA AMBAYE", "huawei", "MARCEL LEFEBVRE"];
+  const hits = queries.map((q) => listsFor(q));
+  assert.ok(hits[0].includes("dpl"));
+  assert.ok(hits[1].includes("el"));
+  assert.ok(hits[2].includes("dpl"));
 });
 
 test("thousand talents plan is identified on the 1286 list", () => {

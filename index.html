@@ -38,12 +38,13 @@
         <div class="search-row">
           <label class="visually-hidden" for="query">Entity or individual name</label>
           <input id="query" type="search" autocomplete="off" spellcheck="false"
-                 placeholder="e.g., Beihang University" disabled>
+                 placeholder="e.g., Beihang University &mdash; or a batch: Huawei, SMIC, ZTE" disabled>
           <button type="submit" id="search-btn" disabled>Search</button>
         </div>
       </form>
       <p class="search-caveat">
         Matches whole words/phrases within listed names and aliases (case-insensitive).
+        Separate multiple parties with commas to screen them in one batch.
         Searches only the source tables in this tool &mdash; no other information is used.
       </p>
       <div class="chips" id="chips" role="list" aria-label="Examples"></div>

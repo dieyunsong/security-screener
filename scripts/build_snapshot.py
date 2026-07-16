@@ -62,14 +62,18 @@ SOURCES = {
 }
 
 LISTS = [
-    {"id": "1260h", "title": "Section 1260H Chinese Military Companies List",
+    {"id": "1260h", "title": "DoW 1260H List (Chinese Military Companies)",
      "citation": "Section 1260H, NDAA FY2021 (10 U.S.C. 113 note) — 91 FR 35189",
-     "agency": "U.S. Department of Defense", "badge": "Department of Defense (DoD)",
-     "url": "https://www.defense.gov/News/Releases/"},
-    {"id": "1286", "title": "Section 1286 List (Institutions & Foreign Talent Programs)",
+     "agency": "U.S. Department of War", "badge": "Department of War (DoW)",
+     "url": "https://www.federalregister.gov/documents/search?conditions%5Bterm%5D=1260H"},
+    {"id": "1286", "title": "DoW 1286 List (Institutions & Foreign Talent Programs)",
      "citation": "Section 1286, John S. McCain NDAA FY2019 (Pub. L. 115-232), as amended — FY24 lists",
-     "agency": "U.S. Department of Defense", "badge": "Department of Defense (DoD)",
+     "agency": "U.S. Department of War", "badge": "Department of War (DoW)",
      "url": "https://basicresearch.defense.gov/Programs/Academic-Research-Security/"},
+    {"id": "sdn", "title": "Specially Designated Nationals (SDN) and Blocked Persons List",
+     "citation": "31 CFR Chapter V; OFAC sanctions programs",
+     "agency": "U.S. Department of the Treasury, Office of Foreign Assets Control", "badge": "Treasury / OFAC",
+     "url": "https://sanctionssearch.ofac.treas.gov/"},
     {"id": "el", "title": "Entity List",
      "citation": "Supplement No. 4 to 15 CFR Part 744",
      "agency": "U.S. Department of Commerce, Bureau of Industry and Security", "badge": "Commerce / BIS",
@@ -82,14 +86,22 @@ LISTS = [
      "citation": "Persons denied export privileges under 15 CFR Part 764",
      "agency": "U.S. Department of Commerce, Bureau of Industry and Security", "badge": "Commerce / BIS",
      "url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl"},
-    {"id": "cmic", "title": "Non-SDN Chinese Military-Industrial Complex Companies (NS-CMIC) List",
-     "citation": "Annex to Executive Order 14032, as amended",
+    {"id": "cmic", "title": "Non-SDN Chinese Military-Industrial Complex Companies (NS-CMIC) List / Annex to E.O. 14032",
+     "citation": "Annex to Executive Order 14032 (June 3, 2021), as amended",
      "agency": "U.S. Department of the Treasury, Office of Foreign Assets Control", "badge": "Treasury / OFAC",
-     "url": "https://ofac.treasury.gov/sanctions-programs-and-country-information/chinese-military-companies-sanctions"},
-    {"id": "dtc", "title": "ITAR Debarred Parties List",
+     "url": "https://www.treasury.gov/ofac/downloads/ccmc/nscmiclist.pdf"},
+    {"id": "dtc", "title": "Debarred Parties List (ITAR)",
      "citation": "Parties debarred under 22 CFR 127.7 (AECA sec. 38)",
      "agency": "U.S. Department of State, Directorate of Defense Trade Controls", "badge": "State / DDTC",
-     "url": "https://www.pmddtc.state.gov/ddtc_public?id=ddtc_kb_article_page&sys_id=c22d1833dbb8d300d0a370131f9619f0"},
+     "url": "https://deccspmddtc.servicenowservices.com/ddtc_public?id=ddtc_kb_article_page&sys_id=c22d1833dbb8d300d0a370131f9619f0"},
+    {"id": "889", "title": "Section 889 Telecommunications Companies",
+     "citation": "Section 889(f)(3), John S. McCain NDAA FY2019 (Pub. L. 115-232; 41 U.S.C. note prec. 3901)",
+     "agency": "U.S. Congress (statutory designation)", "badge": "NDAA Section 889",
+     "url": "https://www.congress.gov/115/bills/hr5515/BILLS-115hr5515enr.pdf"},
+    {"id": "5949", "title": "Section 5949 Semiconductor Companies",
+     "citation": "Section 5949(a), James M. Inhofe NDAA FY2023 (Pub. L. 117-263; 41 U.S.C. 4713 note)",
+     "agency": "U.S. Congress (statutory designation)", "badge": "NDAA Section 5949",
+     "url": "https://www.congress.gov/bill/117th-congress/house-bill/7776/text"},
     {"id": "isn", "title": "Nonproliferation Sanctions",
      "citation": "Sanctions under various statutory authorities (State/ISN)",
      "agency": "U.S. Department of State, Bureau of International Security and Nonproliferation", "badge": "State / ISN",
@@ -109,6 +121,7 @@ LISTS = [
 ]
 
 CSL_SOURCE_TO_LIST = {
+    "Specially Designated Nationals (SDN) - Treasury Department": "sdn",
     "Entity List (EL) - Bureau of Industry and Security": "el",
     "Military End User (MEU) List - Bureau of Industry and Security": "meu",
     "Denied Persons List (DPL) - Bureau of Industry and Security": "dpl",
@@ -116,6 +129,30 @@ CSL_SOURCE_TO_LIST = {
     "ITAR Debarred (DTC) - State Department": "dtc",
     "Nonproliferation Sanctions (ISN) - State Department": "isn",
 }
+
+
+# Entities named directly in statute. Section 889(f)(3) (NDAA FY2019) and
+# section 5949(a) (NDAA FY2023) each designate the companies below "and any
+# subsidiary or affiliate" (889) / "any subsidiary, affiliate, or successor"
+# (5949); update here only if Congress amends the statutes.
+STATUTORY_ENTRIES = [
+    {"n": "Huawei Technologies Company", "a": ["Huawei"], "l": "889",
+     "note": "Named in section 889(f)(3)(A); includes subsidiaries and affiliates"},
+    {"n": "ZTE Corporation", "a": ["ZTE"], "l": "889",
+     "note": "Named in section 889(f)(3)(A); includes subsidiaries and affiliates"},
+    {"n": "Hytera Communications Corporation", "a": ["Hytera"], "l": "889",
+     "note": "Named in section 889(f)(3)(B); includes subsidiaries and affiliates"},
+    {"n": "Hangzhou Hikvision Digital Technology Company", "a": ["Hikvision"], "l": "889",
+     "note": "Named in section 889(f)(3)(B); includes subsidiaries and affiliates"},
+    {"n": "Dahua Technology Company", "a": ["Dahua"], "l": "889",
+     "note": "Named in section 889(f)(3)(B); includes subsidiaries and affiliates"},
+    {"n": "Semiconductor Manufacturing International Corporation", "a": ["SMIC"], "l": "5949",
+     "note": "Named in section 5949(a)(2)(B); includes subsidiaries, affiliates, and successors"},
+    {"n": "ChangXin Memory Technologies", "a": ["CXMT"], "l": "5949",
+     "note": "Named in section 5949(a)(2)(B); includes subsidiaries, affiliates, and successors"},
+    {"n": "Yangtze Memory Technologies Corp", "a": ["YMTC"], "l": "5949",
+     "note": "Named in section 5949(a)(2)(B); includes subsidiaries, affiliates, and successors"},
+]
 
 
 def fetch(name, refresh=False):
@@ -490,6 +527,7 @@ def main():
     entries += parse_fcc(paths["fcc.html"])
     entries += parse_uflpa(paths["uflpa.html"])
     entries += parse_wro(paths["wro_doc.html"], refresh=args.refresh)
+    entries += STATUTORY_ENTRIES
 
     counts = {}
     for e in entries:

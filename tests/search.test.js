@@ -97,3 +97,34 @@ test("each entry appears at most once even if name and alias both match", () => 
   const results = search("huawei", snapshot);
   assert.equal(results.length, 1);
 });
+
+// --- batch parsing ---
+
+import { parseQueries } from "../js/search.js";
+
+test("parseQueries splits on commas and trims", () => {
+  assert.deepEqual(parseQueries("SABA AMBAYE, huawei, MARCEL LEFEBVRE"),
+    ["SABA AMBAYE", "huawei", "MARCEL LEFEBVRE"]);
+});
+
+test("parseQueries splits on semicolons and newlines", () => {
+  assert.deepEqual(parseQueries("Beihang University; ZTE\nHikvision"),
+    ["Beihang University", "ZTE", "Hikvision"]);
+});
+
+test("parseQueries keeps corporate suffixes attached (Co., Ltd.)", () => {
+  assert.deepEqual(parseQueries("Huawei Technologies Co., Ltd., SMIC"),
+    ["Huawei Technologies Co., Ltd.", "SMIC"]);
+});
+
+test("parseQueries drops empties and dedupes case-insensitively", () => {
+  assert.deepEqual(parseQueries(" huawei ,, HUAWEI , zte "), ["huawei", "zte"]);
+});
+
+test("parseQueries returns single-item array for a plain query", () => {
+  assert.deepEqual(parseQueries("Beihang University"), ["Beihang University"]);
+});
+
+test("parseQueries returns empty array for blank input", () => {
+  assert.deepEqual(parseQueries("  "), []);
+});

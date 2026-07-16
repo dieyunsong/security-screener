@@ -15,21 +15,28 @@ enumerated in **Appendix A** of the NSF Dear Colleague Letter
 > [Export Controls & International Compliance office](https://exports.northwestern.edu/federal-regulations/restricted-party-screenings.html)
 > at <exportcontrols@northwestern.edu>.
 
-## Lists included (11)
+## Lists included (14)
 
 | List | Agency |
 |---|---|
-| Section 1260H Chinese Military Companies List | Dept. of Defense |
-| Section 1286 List (institutions & foreign talent programs) | Dept. of Defense |
+| DoW 1260H List (Chinese Military Companies) | Dept. of War |
+| DoW 1286 List (institutions & foreign talent programs) | Dept. of War |
+| Specially Designated Nationals (SDN) and Blocked Persons List | Treasury / OFAC |
 | Entity List (Supp. No. 4 to 15 CFR Part 744) | Commerce / BIS |
 | Military End-User (MEU) List (Supp. No. 7 to Part 744) | Commerce / BIS |
 | Denied Persons List | Commerce / BIS |
-| Non-SDN Chinese Military-Industrial Complex Companies (Annex to E.O. 14032) | Treasury / OFAC |
-| ITAR Debarred Parties List | State / DDTC |
+| Non-SDN Chinese Military-Industrial Complex Companies / Annex to E.O. 14032 | Treasury / OFAC |
+| Debarred Parties List (ITAR) | State / DDTC |
+| Section 889 telecommunications companies (NDAA FY2019) | statutory |
+| Section 5949 semiconductor companies (NDAA FY2023) | statutory |
 | Nonproliferation Sanctions | State / ISN |
 | Covered List (Secure and Trusted Communications Networks Act) | FCC |
 | UFLPA Entity List | DHS |
 | Withhold Release Orders & Findings (active) | CBP |
+
+Searches accept a single party or a comma/semicolon/newline-separated batch
+(e.g. `SABA AMBAYE, huawei, MARCEL LEFEBVRE`); each party is screened
+independently.
 
 ## How it works
 
