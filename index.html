@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Restricted Party Screener</title>
+  <meta name="description" content="Preliminary self-check of entities and individuals against the U.S. federal restricted party lists enumerated in Appendix A of NSF's Dear Colleague Letter on prohibited-party collaborations.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="topbar">
+    <span class="topbar-brand">Northwestern University</span>
+    <span class="topbar-note">Preliminary self-check aid &mdash; not an official Export Controls determination</span>
+  </div>
+
+  <header class="masthead">
+    <div class="container">
+      <h1>Restricted Party Screener</h1>
+      <p class="subtitle">
+        Type an entity or individual to check against the consolidated screening lists by
+        US federal agencies. Knowledge base of this tool is based on
+        <a href="https://www.nsf.gov/funding/information/dcl-prohibition-collaborations-entities-us-prohibited-party">https://www.nsf.gov/funding/information/dcl-prohibition-collaborations-entities-us-prohibited-party</a>.
+        Aliases are recognized.
+      </p>
+      <p class="stats" id="stats" hidden></p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="load-error" class="load-error" hidden>
+      <strong>Screening data failed to load.</strong>
+      Do not treat this as a screening result. Reload the page or contact the
+      <a href="mailto:exportcontrols@northwestern.edu">Export Controls &amp; International Compliance office</a>.
+    </div>
+
+    <section class="search-card" aria-label="Search">
+      <form id="search-form">
+        <div class="search-row">
+          <label class="visually-hidden" for="query">Entity or individual name</label>
+          <input id="query" type="search" autocomplete="off" spellcheck="false"
+                 placeholder="e.g., Beihang University" disabled>
+          <button type="submit" id="search-btn" disabled>Search</button>
+        </div>
+      </form>
+      <p class="search-caveat">
+        Matches whole words/phrases within listed names and aliases (case-insensitive).
+        Searches only the source tables in this tool &mdash; no other information is used.
+      </p>
+      <div class="chips" id="chips" role="list" aria-label="Examples"></div>
+    </section>
+
+    <section id="results" aria-live="polite"></section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <h2>Lists included in this tool</h2>
+      <ul id="footer-lists" class="footer-lists"></ul>
+      <div class="disclaimer">
+        <p>
+          <strong>Disclaimer.</strong> This is an informal pre-screening aid intended to help
+          Northwestern faculty and staff who receive federal funding take a first look at
+          potential collaborators. It is <strong>not</strong> an official Northwestern University
+          Export Controls determination, and a &ldquo;no match&rdquo; result is
+          <strong>not</strong> a clearance. The embedded data is a point-in-time snapshot and may
+          lag the official lists. For authoritative restricted party screening (performed with
+          Visual Compliance), contact the
+          <a href="https://exports.northwestern.edu/federal-regulations/restricted-party-screenings.html">Export
+          Controls &amp; International Compliance office</a> at
+          <a href="mailto:exportcontrols@northwestern.edu">exportcontrols@northwestern.edu</a>.
+        </p>
+        <p id="snapshot-note"></p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
