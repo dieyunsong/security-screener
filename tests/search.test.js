@@ -11,6 +11,8 @@ const snapshot = {
     { n: "Université Libre de Test", a: [], l: "isn" },
     { n: "Xi'an Aircraft Industry Group Company Ltd.", a: [], l: "1260h" },
     { n: "Zhongji Innolight Co., Ltd.", a: ["Innolight"], l: "1260h" },
+    { n: "PUTIN, Vladimir Vladimirovich", a: ["PUTIN, Vladimir"], l: "sdn" },
+    { n: "LIN, Wei", a: [], l: "sdn" },
   ],
 };
 
@@ -42,9 +44,14 @@ test("matches inside a name at word boundaries", () => {
   assert.ok(results.length > 0);
 });
 
-test("does not match partial words", () => {
+test("does not match unrelated partial words", () => {
   assert.equal(search("hang", snapshot).length, 0);
-  assert.equal(search("niversity", snapshot).length, 0);
+});
+
+test("single-word typo matches approximately", () => {
+  const results = search("niversity", snapshot); // typo of "university"
+  assert.ok(results.length > 0);
+  assert.ok(results.every((r) => r.matchType === "approximate"));
 });
 
 test("matches aliases and reports the matched text", () => {
@@ -65,8 +72,11 @@ test("multi-word phrase matches across the name", () => {
   assert.equal(results[0].entry.n, "Harbin Institute of Technology");
 });
 
-test("out-of-order words do not match (phrase matching)", () => {
-  assert.equal(search("institute harbin", snapshot).length, 0);
+test("out-of-order words match as a reordered token match", () => {
+  const results = search("institute harbin", snapshot);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].entry.n, "Harbin Institute of Technology");
+  assert.equal(results[0].matchType, "reordered");
 });
 
 test("query with diacritics matches plain target and vice versa", () => {
@@ -88,9 +98,49 @@ test("queries shorter than 2 characters return nothing", () => {
   assert.equal(search("   ", snapshot).length, 0);
 });
 
-test("regex metacharacters in query are treated literally", () => {
-  assert.equal(search("co. (ltd)", snapshot).length, 0); // no crash, no match
+test("regex metacharacters in query do not crash and match literally", () => {
+  const results = search("co. (ltd)", snapshot); // matches entries with 'co' and 'ltd' tokens
+  assert.ok(results.every((r) => ["exact", "reordered"].includes(r.matchType)));
   assert.equal(search("xi'an aircraft industry group company ltd.", snapshot).length, 1);
+});
+
+// --- recall-oriented name matching ---
+
+test("flipped first/last name matches a comma-formatted listed name", () => {
+  const results = search("vladimir putin", snapshot);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].entry.n, "PUTIN, Vladimir Vladimirovich");
+  assert.equal(results[0].matchType, "reordered");
+});
+
+test("listed-name order with punctuation also matches", () => {
+  assert.equal(search("putin, vladimir", snapshot).length, 1);
+  assert.equal(search("putin vladimir", snapshot).length, 1);
+});
+
+test("shortened given name matches by prefix", () => {
+  const results = search("vlad putin", snapshot);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].matchType, "approximate");
+});
+
+test("typo in a name still matches", () => {
+  assert.equal(search("vladmir putin", snapshot).length, 1);  // dropped letter
+  assert.equal(search("vladimir puttin", snapshot).length, 1); // doubled letter
+});
+
+test("very short tokens do not fuzzy-match different short tokens", () => {
+  // "li" must not match "LIN, Wei" (would flood results)
+  assert.equal(search("li wei", snapshot).length, 0);
+});
+
+test("all query tokens must find a distinct listed token", () => {
+  assert.equal(search("vladimir aircraft", snapshot).length, 0);
+});
+
+test("exact phrase matches keep matchType exact", () => {
+  const results = search("beihang university", snapshot);
+  assert.ok(results.every((r) => r.matchType === "exact"));
 });
 
 test("each entry appears at most once even if name and alias both match", () => {

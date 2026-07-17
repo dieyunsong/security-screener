@@ -57,5 +57,19 @@ test("thousand talents plan is identified on the 1286 list", () => {
 });
 
 test("an unlisted name returns no matches", () => {
-  assert.equal(search("northwestern university", snapshot).length, 0);
+  assert.equal(search("evanston lakefill bakery", snapshot).length, 0);
+});
+
+// Recall guard: "northwestern university" must surface Northwestern
+// POLYTECHNICAL University (Xi'an, PRC — Entity List / 1286), a nearby
+// name a screener could otherwise be falsely reassured about.
+test("northwestern university surfaces Northwestern Polytechnical University", () => {
+  const lists = listsFor("northwestern university");
+  assert.ok(lists.includes("el"));
+  assert.ok(lists.includes("1286"));
+});
+
+test("vladimir putin is found on the SDN list despite flipped name order", () => {
+  assert.ok(listsFor("vladimir putin").includes("sdn"));
+  assert.ok(listsFor("vlad putin").includes("sdn"));
 });

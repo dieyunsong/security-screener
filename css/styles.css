@@ -188,6 +188,21 @@ a { color: var(--nu-purple); }
 .list-card ul { margin: 8px 0 2px; padding-left: 22px; }
 .list-card li { margin-bottom: 6px; overflow-wrap: anywhere; }
 .matched-name { font-weight: 600; }
+.list-card.approx { border-left-color: #C97B12; }
+.tag-approx {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #7A4A08;
+  background: #FBF0DD;
+  border: 1px solid #E3C08A;
+  border-radius: 4px;
+  padding: 0 5px;
+  margin-left: 4px;
+  vertical-align: 1px;
+}
 mark { background: #F1DE81; padding: 0 1px; }
 .entry-note, .via-alias { color: var(--muted); font-size: 12.5px; }
 

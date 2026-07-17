@@ -1,4 +1,4 @@
-import { normalize, parseQueries, search } from "./search.js";
+import { normalize, parseQueries, prepareSnapshot, search } from "./search.js";
 
 const EXAMPLES = ["Huawei", "Beihang University", "SMIC", "ZTE", "Hikvision",
   "Harbin Institute of Technology"];
@@ -56,7 +56,8 @@ function renderFooter() {
   ).join("");
   el.snapshotNote.innerHTML =
     `Data snapshot: <strong>${esc(snapshot.built)}</strong>. Basis: Appendix A of the ` +
-    `<a href="${esc(snapshot.basisUrl)}">NSF Dear Colleague Letter on prohibited-party collaborations</a>.`;
+    `<a href="${esc(snapshot.basisUrl)}">NSF Dear Colleague Letter on prohibited-party collaborations</a> ` +
+    `and <a href="https://basicresearch.defense.gov/Portals/61/Documents/Academic%20Research%20Security%20Page/2026%20DoW%20Component%20Decision%20Matrix%20to%20Inform%20Fundamental%20Research%20Proposal%20Mitigation%20Decisions.pdf?ver=uf_txB5YT_N7ewpWfbpO5w%3d%3d">DoD's prohibited entity lists</a>.`;
 }
 
 function renderStats() {
@@ -66,6 +67,8 @@ function renderStats() {
     `<span>data snapshot ${esc(snapshot.built)}</span>`;
   el.stats.hidden = false;
 }
+
+const MAX_ROWS_PER_LIST = 200;
 
 function buildResultBlock(query, results) {
   const byList = new Map();
@@ -87,33 +90,56 @@ function buildResultBlock(query, results) {
       </div>`;
   }
 
+  // A list is a "firm" hit when it has at least one exact or reordered
+  // match; lists reached only through typo/prefix tolerance are reported
+  // separately so approximate noise never buries a firm hit.
+  const isFirm = (l) => byList.get(l.id).some((r) => r.matchType !== "approximate");
+  const firm = listsHit.filter(isFirm);
+  const approxOnly = listsHit.filter((l) => !isFirm(l));
+
+  const headline = firm.length
+    ? `identified in ${firm.length} ${firm.length === 1 ? "list" : "lists"}:
+       ${firm.map((l) => esc(l.title)).join("; ")}`
+    : `possible (approximate) matches in ${approxOnly.length}
+       ${approxOnly.length === 1 ? "list" : "lists"}`;
+  const approxNote = firm.length && approxOnly.length
+    ? ` Additional approximate matches appear in ${approxOnly.length} more
+       ${approxOnly.length === 1 ? "list" : "lists"} below.` : "";
+
   const summary = `
     <div class="summary hit">
-      <h2><span class="q">${esc(query)}</span> &mdash; identified in ${listsHit.length}
-        ${listsHit.length === 1 ? "list" : "lists"}: ${listsHit.map((l) => esc(l.title)).join("; ")}</h2>
+      <h2><span class="q">${esc(query)}</span> &mdash; ${headline}</h2>
       <p>Results reflect only the source tables in this tool. Matches may be on the listed name
-      or on an associated alias. A match indicates a potential restricted party &mdash; contact the
-      <a href="https://exports.northwestern.edu/federal-regulations/restricted-party-screenings.html">Export
+      or on an associated alias; approximate matches (reversed word order, shortened forms,
+      small typos) are labeled.${approxNote} A match indicates a potential restricted party &mdash;
+      contact the <a href="https://exports.northwestern.edu/contact.html">Export
       Controls &amp; International Compliance office</a> before proceeding.</p>
     </div>`;
 
-  const cards = listsHit.map((l) => {
-    const rows = byList.get(l.id).map((r) => {
+  const cards = [...firm, ...approxOnly].map((l) => {
+    const all = byList.get(l.id);
+    const shown = all.slice(0, MAX_ROWS_PER_LIST);
+    const rows = shown.map((r) => {
       const viaAlias = r.matched !== r.entry.n;
       return `<li>
         <span class="matched-name">${highlight(r.entry.n, query)}</span>
+        ${r.matchType === "approximate" ? `<span class="tag-approx">approximate</span>` : ""}
         ${viaAlias ? `<span class="via-alias"> &mdash; matched alias: ${highlight(r.matched, query)}</span>` : ""}
         ${r.entry.note ? `<div class="entry-note">${esc(r.entry.note)}</div>` : ""}
       </li>`;
     }).join("");
+    const capNote = all.length > shown.length
+      ? `<p class="entry-note">Showing the first ${MAX_ROWS_PER_LIST} of ${all.length} matches
+         &mdash; refine the search to narrow results.</p>` : "";
     return `
-      <div class="list-card">
+      <div class="list-card${isFirm(l) ? "" : " approx"}">
         <span class="badge">${esc(l.badge)}</span>
         <h3>${esc(l.title)}</h3>
         <p class="citation">${esc(l.citation)} &mdash; ${esc(l.agency)}</p>
         <details>
-          <summary>Show matched entries (${byList.get(l.id).length})</summary>
+          <summary>Show matched entries (${all.length})${isFirm(l) ? "" : " — approximate only"}</summary>
           <ul>${rows}</ul>
+          ${capNote}
         </details>
       </div>`;
   }).join("");
@@ -158,7 +184,7 @@ async function init() {
   try {
     const resp = await fetch("data/snapshot.json");
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    snapshot = await resp.json();
+    snapshot = prepareSnapshot(await resp.json());
   } catch (err) {
     el.loadError.hidden = false;
     return;

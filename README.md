@@ -42,9 +42,14 @@ independently.
 
 - `data/snapshot.json` — a point-in-time compilation of the lists above,
   built by `scripts/build_snapshot.py`. The snapshot date is shown in the UI.
-- `js/search.js` — pure matching logic: case-, diacritic-, and
-  whitespace-insensitive whole word/phrase matching over listed names and
-  aliases. No fuzzy scoring; every match is explainable.
+- `js/search.js` — pure matching logic over listed names and aliases,
+  case-, diacritic-, and whitespace-insensitive, in three explainable tiers:
+  **exact** (contiguous word/phrase), **reordered** (all query words present
+  in any order — catches "vladimir putin" vs "PUTIN, Vladimir"), and
+  **approximate** (prefixes such as "vlad" → "vladimir", and small typos:
+  1 edit for 4–7-letter words, 2 edits for 8+). Matching is deliberately
+  recall-oriented for security control — approximate matches are labeled in
+  the UI rather than suppressed, and firm hits are always listed first.
 - `js/app.js` + `index.html` + `css/styles.css` — static UI, no framework,
   no build step, no external services.
 
